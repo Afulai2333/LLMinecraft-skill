@@ -1,4 +1,4 @@
-﻿# Minecraft MCP Pilot skill
+# Minecraft MCP Pilot skill
 
 A skill bundle for an LLM agent that plays Minecraft: Java Edition 26.3 through the
 **LLMinecraft** Fabric mod. The mod runs an MCP server inside the game; this skill teaches
@@ -23,7 +23,7 @@ examples/mcp.json            example client configuration
    http://127.0.0.1:8765/mcp`.
 4. In game: `/llmcraft status`.
 
-Build it yourself from the project's `mod_src/dev`:
+Build it yourself from the [mod repository](https://github.com/Afulai2333/LLMinecraft):
 
 ```bash
 cd LLMinecraft
