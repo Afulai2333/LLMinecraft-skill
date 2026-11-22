@@ -14,7 +14,7 @@ Quick checks:
 
 ```bash
 curl -s http://127.0.0.1:8765/health
-# {"ok":true,"name":"llmcraft","version":"0.1.0","tools":34,...}
+# {"ok":true,"name":"llmcraft","version":"0.1.1","tools":35,...}
 
 curl -s -X POST http://127.0.0.1:8765/mcp \
   -H 'Content-Type: application/json' \

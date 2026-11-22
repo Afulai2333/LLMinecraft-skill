@@ -1,4 +1,4 @@
-﻿---
+---
 name: minecraft-mcp-pilot
 description: Play Minecraft: Java Edition through the LLMinecraft Fabric mod's MCP server. Use when the task is to control a Minecraft character (gather wood, craft tools, mine, build, fight, explore, survive) by calling tools such as get_state, goto, mine, place, craft and attack over MCP. Also use when connecting an agent to a local Minecraft MCP endpoint or debugging that connection.
 ---
@@ -16,7 +16,7 @@ The mod starts a Streamable HTTP MCP server with the game:
 
 - URL: `http://127.0.0.1:8765/mcp`
 - Health check: `http://127.0.0.1:8765/health`
-- Tools: 34 (`get_state` ... `respawn`)
+- Tools: 35 (`get_state` ... `respawn`)
 - Auth: off by default on loopback. If `requireToken` is true in
   `config/llmcraft.json`, send `Authorization: Bearer <authToken>`.
 - In singleplayer the integrated server is **frozen while you think** (`freezeWhenIdle`).
@@ -90,6 +90,10 @@ task. Check `get_events.latest_id` to avoid replaying old events.
 - `autoDefend` attacks a nearby non-creeper with a sword/axe while the agent is idle. It
   never hits creepers, and it will not interrupt a running action. Do not rely on it as a
   full combat AI: check `threats`, retreat, pillar up, or fight deliberately.
+- A hostile within 8 blocks forcibly interrupts `wait` and `sleep`; treat the returned error
+  as an immediate danger signal, not a failed delay.
+- For a known-safe farm wait (mob tower, grinder), call `wait(seconds=..., force=true)` so
+  the threat monitor does not cancel it. Do not use `force` in open survival combat.
 - If `threats.level` is `danger`, prioritize survival over the current build/mine task.
   Eat, back away, place blocks between you and the mob, or fight with `attack`.
 - Skeletons and witches hit from range; do not stand still in the open. Creepers require
@@ -119,6 +123,19 @@ Do not assume the state from an earlier call. The world changes while you think.
 - Minecraft yaw: `0` = south (+Z), `90` = west (-X), `-90` = east (+X), `卤180` = north.
   Pitch: `-90` = up, `90` = down.
 - Times are real; 20 ticks = 1 second. `move` and `wait` take seconds.
+
+## Jumping and pillaring
+
+- `jump(forward=false)` jumps in place; `jump(forward=true)` hops while moving forward.
+- `jump_on(x,y,z, sprint=false)` deliberately jumps onto the top of a block. It supports
+  parkour/sprint jumps up to about 4.5 blocks horizontally and one block up; long jumps
+  sprint automatically. Fences and walls do not qualify. Set `sprint=true` for a medium jump
+  that needs extra distance.
+- To pillar up: hold a block, call `place(x, y, z, jump=true)` where `(x,y,z)` is the block
+  your feet currently occupy. The mod jumps first, places the block underneath, and lands on
+  it. Repeat one block at a time; do not use this over lava without checking the surface.
+- `jump_on` and `place(jump=true)` are deliberate actions; `goto` already handles ordinary
+  one-block step-ups. Do not try to jump onto fences/walls.
 
 ## The control loop
 
@@ -222,7 +239,7 @@ The source lives in the project's `mod_src/dev`; the MCP core is
 ```bash
 cd LLMinecraft
 ./gradlew build
-# jar: build/libs/llmcraft-0.1.0.jar
+# jar: build/libs/llmcraft-0.1.1.jar
 ```
 
 Install it with Fabric Loader 0.20.1 and Fabric API 0.166.2+26.3 for Minecraft 26.3.

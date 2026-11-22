@@ -18,7 +18,7 @@ examples/mcp.json            example client configuration
 ## Install the mod
 
 1. Install Fabric Loader 0.20.1 for Minecraft 26.3.
-2. Put `llmcraft-0.1.0.jar` and **Fabric API 0.166.2+26.3** in `.minecraft/mods/`.
+2. Put `llmcraft-0.1.1.jar` and **Fabric API 0.166.2+26.3** in `.minecraft/mods/`.
 3. Launch the game, join a world. The mod logs `MCP server listening on
    http://127.0.0.1:8765/mcp`.
 4. In game: `/llmcraft status`.
@@ -28,7 +28,7 @@ Build it yourself from the [mod repository](https://github.com/Afulai2333/LLMine
 ```bash
 cd LLMinecraft
 JAVA_HOME=/path/to/jdk-25 ./gradlew build
-# build/libs/llmcraft-0.1.0.jar
+# build/libs/llmcraft-0.1.1.jar
 ```
 
 ## Connect the skill to an agent

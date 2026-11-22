@@ -163,6 +163,18 @@ Fails if a GUI is open or the player is riding.
 
 `forward: bool` (default false). Jumps in place, or forward.
 
+### `jump_on`
+
+| Argument | Type | Meaning |
+| --- | --- | --- |
+| `x`, `y`, `z` | int | solid block to jump onto |
+| `sprint` | bool | force sprint for a parkour jump (auto-sprints above ~1.8 blocks) |
+
+Jumps deliberately onto the top of a block. The target top can be up to 1.3 blocks above
+(or up to 2.5 blocks below) the current feet, and up to 4.5 blocks horizontally. Long jumps
+automatically sprint; this supports parkour gaps. Fences and walls are not valid targets
+(their top is 1.5 blocks up). Returns the landed position, sprint flag, or an error.
+
 ### `goto`
 
 | Argument | Type | Meaning |
@@ -172,13 +184,17 @@ Fails if a GUI is open or the player is riding.
 | `y` | int optional | destination feet y; omit to find the surface |
 
 A* pathfinding: walks, steps up one block, drops up to three, rejects lava/fire/cactus.
-It does **not** mine, swim long distances, open doors or bridge. Up to 128 blocks from the
+It does **not** mine, swim long distances, open doors, bridge, or jump onto fences/walls
+(their 1.5-block collision top is above vanilla jump height). Up to 128 blocks from the
 player. Returns `Reached ...` on success, or an error explaining blockage. It recomputes the
 path twice on getting stuck, then fails. For a blocked route, mine a tunnel or use `move`.
 
 ### `wait`
 
-`seconds: number` 0.1-0, default 1. Lets game time pass.
+`seconds: number` 0.1–30, default 1. `force: boolean`, default false. Lets game time pass.
+A hostile within 8 blocks interrupts `wait`/`sleep` early with an error and a
+`wait_interrupted` event. `force=true` disables that interruption — use it only in a safe
+mob farm or another known-controlled environment.
 
 ## Interaction
 
@@ -204,10 +220,12 @@ breaks instantly.
 | `x`, `y`, `z` | int | position to fill (must be air/replaceable) |
 | `block` | string optional | hotbar item id/name; otherwise the held item |
 | `face` | enum optional | direction from target to the support block: `up/down/north/south/east/west`; auto by default |
+| `jump` | bool | jump first, then place into the cell under the feet (pillar up) |
 
 The support block is the neighbour being clicked. Example: filling the air above grass,
 support is below →`face="down"`. Returns when the block appears. Fails if the player
-occupies the space, there is no support, or the item is not a BlockItem.
+occupies the space, there is no support, or the item is not a BlockItem. With `jump=true`,
+the player jumps clear of the target and places the block underneath, then lands on it.
 
 ### `use`
 
@@ -239,6 +257,7 @@ Respects the attack cooldown (about 12 ticks between hits). Target must be in re
 | Argument | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `seconds` | number 0.1–60 | 5 | how long the world should run |
+| `force` | boolean | false | do not interrupt for nearby hostiles (mob farms) |
 
 Runs the world for the requested duration with the idle tick freeze **suspended**. Use it for
 furnaces, crops, mob movement, effects and daylight. Returns `world_ticks`, `time_of_day`,
